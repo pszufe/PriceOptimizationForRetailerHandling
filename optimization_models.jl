@@ -502,14 +502,24 @@ mmm = solveRSMaddCentral()
 # ewunrualnie rozne b (cenowa elastycznosc popytu)
 wwwM = wholesalePriceContractM()
 wwwR = wholesalePriceContractR()
+rrrM = solveRSMaddDecentral()
+cccM = solveCRSMaddDecentral()
+rrrR = solveRSRaddDecentral()
 
+
+
+# model central manufacturer hand
 wpcm = []
-for hm in 1:0.5:5
-    for hc in 1:0.5:3
-        for α in 0.05:0.05:0.2
-            wwwM = wholesalePriceContractM(;hm, hc, α)
-            res = (;hm, hc, α, wwwM...)
-            push!(wpcm, res)
+for hm in 1:0.5:3
+    for hc in 2:0.5:4
+        for α in 0.05:0.05:0.15
+            for c in 0.5:0.5:2
+                for v in 0.2:0.1:0.4
+                    mmm = solveRSMaddCentral(;hm, hc, α, c, v)
+                    res = (;hm, hc, α, mmm...)
+                    push!(wpcm, res)
+              end
+           end
         end
     end
 end
@@ -518,34 +528,168 @@ dfwpcm = DataFrame(wpcm)
 using CSV
 CSV.write("dfwpcm.csv", dfwpcm)
 
+# model central retailer hand
+
+wpcr = []
+for hm in 3:0.5:5
+    for hc in 1:0.5:2
+        for α in 0.05:0.05:0.15
+            for c in 0.5:0.5:2
+                for v in 0.2:0.1:0.4
+                    mmm = solveRSMaddCentral(;hm, hc, α, c, v)
+                    res = (;hm, hc, α, c, v, mmm...)
+                    push!(wpcm, res)
+              end
+           end
+        end
+    end
+end
+dfwpcr = DataFrame(wpcr)
+
+using CSV
+CSV.write("dfwpcr.csv", dfwpcr)
+
+# wholesaleprice manufacturer hand
+
 cm = []
-for hm in 1:0.5:5
-    for hc in 1:0.5:3
-        for α in 0.05:0.05:0.2
-            wwwM = wholesalePriceContractM(;hm, hc, α)
-            res = (;hm, hc, α, wwwM...)
-            push!(cm, res)
+for hm in 1:0.5:3
+    for hc in 2:0.5:4
+        for α in 0.05:0.05:0.15
+            for c in 0.5:0.5:2
+                for v in 0.2:0.1:0.4
+                    wwwM = wholesalePriceContractM(;hm, hc, α, c, v)
+                    res = (;hm, hc, α, c, v, wwwM...)
+                    push!(cm, res)
+               end
+           end
         end
     end
 end
 dfcm = DataFrame(cm)
+using CSV
 CSV.write("dfcm.csv", dfcm)
 
-
 using Plots
-d = df[ (df.hc .== 1.0) .&& (df.α .== 0.2), : ]
+d = df[ (df.hc .== 2.0) .&& (df.α .== 0.15), : ]
 
+# wholesaleprice retailer hand
 
 cr = []
-for hr in 1:0.5:5
-    for hc in 1:0.5:3
-        for α in 0.05:0.05:0.2
-            wwwR = wholesalePriceContractR(;hr, hc, α)
-            res = (;hr, hc, α, wwwR...)
-            push!(cr, res)
+for hr in 3:0.5:5
+    for hc in 1:0.5:2
+        for α in 0.05:0.05:0.15
+            for c in 0.5:0.5:2
+                for v in 0.2:0.1:0.4
+                    wwwR = wholesalePriceContractR(;hr, hc, α, c, v)
+                    res = (;hr, hc, α, c, v, wwwR...)
+                    push!(cr, res)
+               end
+           end 
         end
     end
 end
 dfcr = DataFrame(cr)
+
+using CSV
 CSV.write("dfcr.csv", dfcr)
+
+# RS reveue-sharing manufacturer hand
+rsm = []
+for hm in 1:0.5:2
+    for hc in 3:0.5:4
+        for α in 0.1:0.05:0.15
+            for c in 1:0.5:2
+                for v in 0.2:0.1:0.4
+                    for r in 0.5:0.5:1
+                        rrrM = solveRSMaddDecentral(;hm, hc, α, c, v, r)
+                        res = (;hm, hc, α, c, v, r, wwwM...)
+                        push!(rsm, res)
+                     end 
+                end
+            end
+        end
+    end
+end
+dfrsm = DataFrame(rsm)
+
+using CSV
+CSV.write("dfrsm.csv", dfrsm)
+
+# CRS cost-reveue-sharing manufacturer hand
+
+crsm = []
+for hm in 1:0.5:2
+    for hc in 3:0.5:4
+        for α in 0.1:0.05:0.15
+            for c in 1:0.5:2
+                for v in 0.2:0.1:0.4
+                    for r in 0.5:0.5:1
+                    cccM = solveCRSMaddDecentral(;hm, hc, α, c, v, r)
+                    res = (;hm, hc, α, c, v, r, cccM...)
+                    push!(rsm, res)
+                  end 
+              end
+           end
+        end
+    end
+end
+dfrsm = DataFrame(crsm)
+
+using CSV
+CSV.write("dfcrsm.csv", dfcrsm)
+
+
+using Plots
+d = df[ (df.hc .== 2.0) .&& (df.α .== 0.15), : ]
+
+#RS retailer hand
+
+rsr = []
+for hr in 3:0.5:4
+    for hc in 0.5:0.5:1.5
+        for α in 0.1:0.05:0.15
+            for c in 1:0.5:2
+                for v in 0.2:0.1:0.4
+                    for r in 0.5:0.5:1
+                        rrrR = solveRSRaddDecentral(;hr, hc, α, c, v)
+                        res = (;hr, hc, α, c, v, rrrR...)
+                        push!(rsr, res)
+                   end 
+               end
+           end 
+        end
+    end
+end
+dfcr = DataFrame(rsr)
+
+using CSV
+CSV.write("dfrsr.csv", dfrsr)
+
+# CRS cost-reveue-sharing retailer hand
+
+crsr = []
+for hr in 3:0.5:4
+    for hc in 0.5:0.5:1.5
+        for α in 0.1:0.05:0.15
+            for c in 1:0.5:2
+                for v in 0.2:0.1:0.4
+                    for r in 0.5:0.5:1
+                        cccM = solveCRSMaddDecentral(;hm, hc, α, c, v, r)
+                        res = (;hm, hc, α, c, v, r, cccM...)
+                        push!(rsm, res)
+                    end 
+                end
+             end
+        end
+    end
+end
+dfrsm = DataFrame(crsm)
+
+using CSV
+CSV.write("dfcrsm.csv", dfcrsm)
+
+
+using Plots
+d = df[ (df.hc .== 2.0) .&& (df.α .== 0.15), : ]
+
 
