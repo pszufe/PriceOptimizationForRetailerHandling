@@ -62,7 +62,7 @@ function solveRSMaddCentral2(opt=Ipopt.Optimizer;
     v= c - 0.1)
 
     @assert 2A + a - b*c - b*α*hc > 0
-    @assert A + a - b*c - b*α*(hc + 2hm) > 0
+    @assert A + a - b*c - b*α*(hc + hm) > 0
 
     m = Model(opt)
     @variable(m, A <= z <= B)
