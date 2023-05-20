@@ -668,7 +668,7 @@ CSV.write("dfrsr.csv", dfrsr)
 # CRS cost-reveue-sharing retailer hand
 
 crsr = []
-for hr in 3:0.5:4
+for hm in 3:0.5:4
     for hc in 0.5:0.5:1.5
         for α in 0.1:0.05:0.15
             for c in 1:0.5:2
@@ -686,7 +686,7 @@ end
 dfrsm = DataFrame(crsm)
 
 using CSV
-CSV.write("dfcrsm.csv", dfcrsm)
+CSV.write("dfcrsr.csv", dfcrsm)
 
 
 using Plots
