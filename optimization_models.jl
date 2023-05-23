@@ -456,7 +456,7 @@ end
 
 # %%
 
-function rsRaddDecentral(z;
+function crsRaddDecentral(z;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -500,11 +500,16 @@ wholesalePriceContractR(opt=Ipopt.Optimizer;
 mmm = solveRSMaddCentral()
 # rozne h i alfa
 # ewunrualnie rozne b (cenowa elastycznosc popytu)
+
 wwwM = wholesalePriceContractM()
 wwwR = wholesalePriceContractR()
 rrrM = solveRSMaddDecentral()
 cccM = solveCRSMaddDecentral()
 rrrR = solveRSRaddDecentral()
+
+# cccR=cccM cost-revenue sharing R= cost-revenue sharing M
+
+# Madd central = Radd central
 
 
 
