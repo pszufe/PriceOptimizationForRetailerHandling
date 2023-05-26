@@ -521,7 +521,7 @@ for hm in 1:0.5:3
             for c in 0.5:0.5:2
                 for v in 0.2:0.1:0.4
                     mmm = solveRSMaddCentral(;hm, hc, α, c, v)
-                    res = (;hm, hc, α, mmm...)
+                    res = (;hm, hc, α, c, v, mmm...)
                     push!(wpcm, res)
               end
            end
@@ -656,8 +656,8 @@ for hr in 3:0.5:4
             for c in 1:0.5:2
                 for v in 0.2:0.1:0.4
                     for r in 0.5:0.5:1
-                        rrrR = solveRSRaddDecentral(;hr, hc, α, c, v)
-                        res = (;hr, hc, α, c, v, rrrR...)
+                        rrrR = solveRSRaddDecentral(;hr, hc, α, c, v, r)
+                        res = (;hr, hc, α, c, v, r, rrrR...)
                         push!(rsr, res)
                    end 
                end
