@@ -543,7 +543,7 @@ for hm in 3:0.5:5
                 for v in 0.2:0.1:0.4
                     mmm = solveRSMaddCentral(;hm, hc, α, c, v)
                     res = (;hm, hc, α, c, v, mmm...)
-                    push!(wpcm, res)
+                    push!(wpcr, res)
               end
            end
         end
@@ -607,7 +607,7 @@ for hm in 1:0.5:2
                 for v in 0.2:0.1:0.4
                     for r in 0.5:0.5:1
                         rrrM = solveRSMaddDecentral(;hm, hc, α, c, v, r)
-                        res = (;hm, hc, α, c, v, r, wwwM...)
+                        res = (;hm, hc, α, c, v, r, rrrM...)
                         push!(rsm, res)
                      end 
                 end
@@ -631,14 +631,14 @@ for hm in 1:0.5:2
                     for r in 0.5:0.5:1
                     cccM = solveCRSMaddDecentral(;hm, hc, α, c, v, r)
                     res = (;hm, hc, α, c, v, r, cccM...)
-                    push!(rsm, res)
+                    push!(crsm, res)
                   end 
               end
            end
         end
     end
 end
-dfrsm = DataFrame(crsm)
+dfcrsm = DataFrame(crsm)
 
 using CSV
 CSV.write("dfcrsm.csv", dfcrsm)
@@ -665,7 +665,7 @@ for hr in 3:0.5:4
         end
     end
 end
-dfcr = DataFrame(rsr)
+dfrsr = DataFrame(rsr)
 
 using CSV
 CSV.write("dfrsr.csv", dfrsr)
@@ -681,14 +681,14 @@ for hm in 3:0.5:4
                     for r in 0.5:0.5:1
                         cccM = solveCRSMaddDecentral(;hm, hc, α, c, v, r)
                         res = (;hm, hc, α, c, v, r, cccM...)
-                        push!(rsm, res)
+                        push!(crsr, res)
                     end 
                 end
              end
         end
     end
 end
-dfrsm = DataFrame(crsm)
+dfcrsr = DataFrame(crsr)
 
 using CSV
 CSV.write("dfcrsr.csv", dfcrsm)
