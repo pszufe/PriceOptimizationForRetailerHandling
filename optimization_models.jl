@@ -81,7 +81,6 @@ end
 #solveRSMaddCentral2()
 
 
-# %%
 function solveRSMaddDecentral(opt=Ipopt.Optimizer;
     A=-1,   # A < 0
     B=-A,
@@ -116,9 +115,6 @@ function solveRSMaddDecentral(opt=Ipopt.Optimizer;
 
     (;z=value(z), pd=value(pd),w=value(w), obj = objective_value(m), status=termination_status(m))
 end
-#@time solveRSMaddDecentral()
-
-# %%
 
 function rsMaddDecentral(z;
     A=-1,   # A < 0
@@ -145,13 +141,6 @@ function rsMaddDecentral(z;
 
 end
 
-#x = -5:0.05:5
-#y = rsMaddDecentral.(x, A=-5, B=5)
-#using Plots
-#plot(x, y)
-
-
-# %%
 """
 using Alpine, Gurobi
 
@@ -166,7 +155,7 @@ const alpine = optimizer_with_attributes(Alpine.Optimizer,
                                          "mip_solver" => gurobi)
 solveRSMaddCentral2(alpine)                                         
 """
-# %% 
+
 function solveCRSMaddCentral(opt=Ipopt.Optimizer;
     A=-1,   # A < 0
     B=-A,
@@ -201,10 +190,6 @@ function solveCRSMaddCentral(opt=Ipopt.Optimizer;
     (;z=value(z), pc=value(pc), ζ = value(ζ),obj=value(obj), status=termination_status(m))
 end
 
-#dd = DataFrame(;solveCRSMaddCentral()...)
-
-
-# %% 
 function solveCRSMaddCentral2(opt=Ipopt.Optimizer;
     A=-1,   # A < 0
     B=-A,
@@ -232,9 +217,6 @@ function solveCRSMaddCentral2(opt=Ipopt.Optimizer;
 
     (;z=value(z), p=value(p), obj = objective_value(m), status=termination_status(m))
 end
-#solveCRSMaddCentral2()
-
-# %% 
 
 function crsMaddDecentral(z;
     A=-1,   # A < 0
@@ -258,13 +240,6 @@ function crsMaddDecentral(z;
     (1 - r)*(pd(z) - v  - α*hm)*(μ(z) + a - b*(pd(z) + α*hc )) + (w(z) - c + (1 - r)*v)*(z + a - b*(pd(z) + α*hc))
 
 end
-
-#x = -1.5:0.05:1.5
-#y = crsMaddDecentral.(x, A=-1.5, B=1.5)
-#using Plots
-#plot(x, y)
-
-# %%
 
 # %%
 function solveCRSMaddDecentral(opt=Ipopt.Optimizer;
@@ -301,9 +276,6 @@ function solveCRSMaddDecentral(opt=Ipopt.Optimizer;
 
     (;z=value(z), pd=value(pd),w=value(w), obj = objective_value(m), status=termination_status(m))
 end
-#solveCRSMaddDecentral(;A=-1.5, B=1.5)
-
-# %%
 
 #################3
 #
@@ -482,7 +454,8 @@ function crsRaddDecentral(z;
 end
 
 
-# %%
+
+"""
 wholesalePriceContractM(opt=Ipopt.Optimizer;
     A=-1, B=-A, a=10.0, b=0.6, c=0.5, α=0.05, hm=0.1, hc=0.1 , v= c - 0.1)  = 
     solveRSMaddDecentral(opt;A,B,a,b,c, α, hm, hc, v, r=1)
@@ -490,25 +463,19 @@ wholesalePriceContractM(opt=Ipopt.Optimizer;
 wholesalePriceContractR(opt=Ipopt.Optimizer;
     A=-1, B=-A, a=10.0, b=0.6, c=0.5, α=0.05, hr=0.1, hc=0.1 , v= c - 0.1)  = 
     solveRSRaddDecentral(opt;A,B,a,b,c, α, hr, hc, v, r=1)
-
+"""
 # %%
 
 # pARAMETER SWEEP: 2X PO H PLUS ALPHA
 
 
-#solveRSMaddCentral
-mmm = solveRSMaddCentral()
-# rozne h i alfa
-# ewunrualnie rozne b (cenowa elastycznosc popytu)
-
-wwwM = wholesalePriceContractM()
-wwwR = wholesalePriceContractR()
-rrrM = solveRSMaddDecentral()
-cccM = solveCRSMaddDecentral()
-rrrR = solveRSRaddDecentral()
-
+# mmm => solveRSMaddCentral
+# wwwM => wholesalePriceContractM
+# wwwR => wholesalePriceContractR
+# rrrM => solveRSMaddDecentral
+# cccM => solveCRSMaddDecentral
+# rrrR => solveRSRaddDecentral
 # cccR=cccM cost-revenue sharing R= cost-revenue sharing M
-
 # Madd central = Radd central
 
 
