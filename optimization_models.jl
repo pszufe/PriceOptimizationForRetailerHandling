@@ -3,9 +3,9 @@ using JuMP, Ipopt
 using DataFrames
 #m = Model(NLopt.Optimizer)
 #set_optimizer_attribute(m, "algorithm", :LD_MMA)
-const ipopt = optimizer_with_attributes(Ipopt.Optimizer, 
+const myoptimizer = optimizer_with_attributes(Ipopt.Optimizer, 
                                         MOI.Silent() => true, 
-                                        "sb" => "yes", 
+                                        "sb" => "yes",                                        
                                         "max_iter"   => 9999)
 
 
@@ -13,7 +13,7 @@ const ipopt = optimizer_with_attributes(Ipopt.Optimizer,
 
 
 
-function solveRSMaddCentral(opt=Ipopt.Optimizer;
+function solveRSMaddCentral(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -50,7 +50,7 @@ end
 
 
 # %%
-function solveRSMaddCentral2(opt=Ipopt.Optimizer;
+function solveRSMaddCentral2(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -81,7 +81,7 @@ end
 #solveRSMaddCentral2()
 
 
-function solveRSMaddDecentral(opt=Ipopt.Optimizer;
+function solveRSMaddDecentral(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -156,7 +156,7 @@ const alpine = optimizer_with_attributes(Alpine.Optimizer,
 solveRSMaddCentral2(alpine)                                         
 """
 
-function solveCRSMaddCentral(opt=Ipopt.Optimizer;
+function solveCRSMaddCentral(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -190,7 +190,7 @@ function solveCRSMaddCentral(opt=Ipopt.Optimizer;
     (;z=value(z), pc=value(pc), ζ = value(ζ),obj=value(obj), status=termination_status(m))
 end
 
-function solveCRSMaddCentral2(opt=Ipopt.Optimizer;
+function solveCRSMaddCentral2(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -242,7 +242,7 @@ function crsMaddDecentral(z;
 end
 
 # %%
-function solveCRSMaddDecentral(opt=Ipopt.Optimizer;
+function solveCRSMaddDecentral(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -283,7 +283,7 @@ end
 #
 #
 
-function solveRSRaddCentral(opt=Ipopt.Optimizer;
+function solveRSRaddCentral(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -320,7 +320,7 @@ end
 
 
 # %%
-function solveRSRaddCentral2(opt=Ipopt.Optimizer;
+function solveRSRaddCentral2(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -352,7 +352,7 @@ end
 
 
 # %%
-function solveRSRaddDecentral(opt=Ipopt.Optimizer;
+function solveRSRaddDecentral(opt=myoptimizer;
     A=-1,   # A < 0
     B=-A,
     a=10.0,
@@ -456,212 +456,30 @@ end
 
 
 """
-wholesalePriceContractM(opt=Ipopt.Optimizer;
+wholesalePriceContractM(opt=myoptimizer;
     A=-1, B=-A, a=10.0, b=0.6, c=0.5, α=0.05, hm=0.1, hc=0.1 , v= c - 0.1)  = 
     solveRSMaddDecentral(opt;A,B,a,b,c, α, hm, hc, v, r=1)
 
-wholesalePriceContractR(opt=Ipopt.Optimizer;
+wholesalePriceContractR(opt=myoptimizer;
     A=-1, B=-A, a=10.0, b=0.6, c=0.5, α=0.05, hr=0.1, hc=0.1 , v= c - 0.1)  = 
     solveRSRaddDecentral(opt;A,B,a,b,c, α, hr, hc, v, r=1)
 """
 # %%
 
-# pARAMETER SWEEP: 2X PO H PLUS ALPHA
-
-
-# mmm => solveRSMaddCentral
-# wwwM => wholesalePriceContractM
-# wwwR => wholesalePriceContractR
-# rrrM => solveRSMaddDecentral
-# cccM => solveCRSMaddDecentral
-# rrrR => solveRSRaddDecentral
-# cccR=cccM cost-revenue sharing R= cost-revenue sharing M
-# Madd central = Radd central
-
-
-
-# model central manufacturer hand
-wpcm = []
-for hm in 1:0.5:3
-    for hc in 2:0.5:4
-        for α in 0.05:0.05:0.15
-            for c in 0.5:0.5:2
-                for v in 0.2:0.1:0.4
-                    mmm = solveRSMaddCentral(;hm, hc, α, c, v)
-                    res = (;hm, hc, α, c, v, mmm...)
-                    push!(wpcm, res)
-              end
-           end
-        end
-    end
-end
-dfwpcm = DataFrame(wpcm)
-
 using CSV
-CSV.write("dfwpcm.csv", dfwpcm)
-
-# model central retailer hand
-
-wpcr = []
-for hm in 3:0.5:5
-    for hc in 1:0.5:2
-        for α in 0.05:0.05:0.15
-            for c in 0.5:0.5:2
-                for v in 0.2:0.1:0.4
-                    mmm = solveRSMaddCentral(;hm, hc, α, c, v)
-                    res = (;hm, hc, α, c, v, mmm...)
-                    push!(wpcr, res)
-              end
-           end
-        end
-    end
+struct ParameterSweep
+    name::String
+    funct::Function
+    sweeps::Vector{Pair{Symbol, Union{Number, AbstractVector{<:Number}}}}
 end
-dfwpcr = DataFrame(wpcr)
-
-using CSV
-CSV.write("dfwpcr.csv", dfwpcr)
-
-# wholesaleprice manufacturer hand
-
-cm = []
-for hm in 1:0.5:3
-    for hc in 2:0.5:4
-        for α in 0.05:0.05:0.15
-            for c in 0.5:0.5:2
-                for v in 0.2:0.1:0.4
-                    wwwM = wholesalePriceContractM(;hm, hc, α, c, v)
-                    res = (;hm, hc, α, c, v, wwwM...)
-                    push!(cm, res)
-               end
-           end
-        end
+function go(sweep::ParameterSweep;basefolder=".")
+    df = DataFrame()
+    prms = vec(collect(Iterators.product( (last.(sweep.sweeps))...)))
+    for values in prms
+        valpairs = Pair.(first.(sweep.sweeps), values)
+        res = sweep.funct(;Dict(valpairs)...)
+        push!(df, (;valpairs..., res...))
     end
+    name = "$(sweep.name)_$(hash(sweep.sweeps)).csv"
+    CSV.write(joinpath(basefolder,name), df,delim='\t')
 end
-dfcm = DataFrame(cm)
-using CSV
-CSV.write("dfcm.csv", dfcm)
-
-using Plots
-d = df[ (df.hc .== 2.0) .&& (df.α .== 0.15), : ]
-
-# wholesaleprice retailer hand
-
-cr = []
-for hr in 3:0.5:5
-    for hc in 1:0.5:2
-        for α in 0.05:0.05:0.15
-            for c in 0.5:0.5:2
-                for v in 0.2:0.1:0.4
-                    wwwR = wholesalePriceContractR(;hr, hc, α, c, v)
-                    res = (;hr, hc, α, c, v, wwwR...)
-                    push!(cr, res)
-               end
-           end 
-        end
-    end
-end
-dfcr = DataFrame(cr)
-
-using CSV
-CSV.write("dfcr.csv", dfcr)
-
-# RS reveue-sharing manufacturer hand
-rsm = []
-for hm in 1:0.5:2
-    for hc in 3:0.5:4
-        for α in 0.1:0.05:0.15
-            for c in 1:0.5:2
-                for v in 0.2:0.1:0.4
-                    for r in 0.5:0.5:1
-                        rrrM = solveRSMaddDecentral(;hm, hc, α, c, v, r)
-                        res = (;hm, hc, α, c, v, r, rrrM...)
-                        push!(rsm, res)
-                     end 
-                end
-            end
-        end
-    end
-end
-dfrsm = DataFrame(rsm)
-
-using CSV
-CSV.write("dfrsm.csv", dfrsm)
-
-# CRS cost-reveue-sharing manufacturer hand
-
-crsm = []
-for hm in 1:0.5:2
-    for hc in 3:0.5:4
-        for α in 0.1:0.05:0.15
-            for c in 1:0.5:2
-                for v in 0.2:0.1:0.4
-                    for r in 0.5:0.5:1
-                    cccM = solveCRSMaddDecentral(;hm, hc, α, c, v, r)
-                    res = (;hm, hc, α, c, v, r, cccM...)
-                    push!(crsm, res)
-                  end 
-              end
-           end
-        end
-    end
-end
-dfcrsm = DataFrame(crsm)
-
-using CSV
-CSV.write("dfcrsm.csv", dfcrsm)
-
-
-using Plots
-d = df[ (df.hc .== 2.0) .&& (df.α .== 0.15), : ]
-
-#RS retailer hand
-
-rsr = []
-for hr in 3:0.5:4
-    for hc in 0.5:0.5:1.5
-        for α in 0.1:0.05:0.15
-            for c in 1:0.5:2
-                for v in 0.2:0.1:0.4
-                    for r in 0.5:0.5:1
-                        rrrR = solveRSRaddDecentral(;hr, hc, α, c, v, r)
-                        res = (;hr, hc, α, c, v, r, rrrR...)
-                        push!(rsr, res)
-                   end 
-               end
-           end 
-        end
-    end
-end
-dfrsr = DataFrame(rsr)
-
-using CSV
-CSV.write("dfrsr.csv", dfrsr)
-
-# CRS cost-reveue-sharing retailer hand
-
-crsr = []
-for hm in 3:0.5:4
-    for hc in 0.5:0.5:1.5
-        for α in 0.1:0.05:0.15
-            for c in 1:0.5:2
-                for v in 0.2:0.1:0.4
-                    for r in 0.5:0.5:1
-                        cccM = solveCRSMaddDecentral(;hm, hc, α, c, v, r)
-                        res = (;hm, hc, α, c, v, r, cccM...)
-                        push!(crsr, res)
-                    end 
-                end
-             end
-        end
-    end
-end
-dfcrsr = DataFrame(crsr)
-
-using CSV
-CSV.write("dfcrsr.csv", dfcrsm)
-
-
-using Plots
-d = df[ (df.hc .== 2.0) .&& (df.α .== 0.15), : ]
-
-
