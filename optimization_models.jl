@@ -446,8 +446,8 @@ function crsRaddDecentral(z;
     F(z) = (z-A)/(B-A)
     F⁻(z) = 1-F(z);
     μ(z) = (B-z)*(B-z)/(2*(A-B))
-    pd(z) = (r*(μ(z) + a - b*α*hc) + b*(α*hr+r*v)F(z))/(b*r*(1 + F(z)))
-    w(z) =  1/(b*(1 + F(z))) * (r*(μ(z) + a - b*α*hc)*F⁻(z) - b*α*hr*F⁻(z) + 2b*r*v*F(z))  
+    pd(z) = (μ(z) + a - b*α*hc + b*(α * hr + v)*F(z))/(b*(1 + F(z)))
+    w(z) =  r/(b*(1 + F(z))) * ((μ(z) + a - b*α*hc)*F⁻(z) - b*α*hr*F⁻(z) + 2b*v*F(z))  
 
     (1 - r)*(pd(z) - v - α*hr)*(μ(z) + a - b*(pd(z) + α*hc )) + (w(z) - c + (1 - r)*v)*(z + a - b*(pd(z) + α*hc))
 
